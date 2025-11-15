@@ -3,16 +3,20 @@ server:
 
 spring:
   application:
-    name: config-sever
+    name: config-server
 
   cloud:
     config:
       server:
         git:
-          uri: https://github.com/your-username/yml_warehouse.git
+          uri: https://github.com/nhnacademy-be12-high-five/yml-warehouse.git
           username: ${GITHUB_USERNAME}
           password: ${GITHUB_TOKEN}
           clone-on-start: true
+
+          search-paths:
+            - '{application}'
+            - '/'
 
 
 eureka:
