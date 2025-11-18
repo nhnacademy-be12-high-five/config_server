@@ -2,9 +2,9 @@ name: Deploy Config Server (Infra)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main","feat/**" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build-and-deploy:
@@ -55,13 +55,10 @@ jobs:
             echo "🚀 Config Server(Infra) 배포를 시작합니다..."
             cd ~/www/nhnbook
             
-            # 1. 최신 이미지 다운로드 (서비스 이름: team5_config_server)
             docker-compose -f docker-compose-infra.yml pull team5_config_server
             
-            # 2. Config Server만 쏙 골라서 재시작
             docker-compose -f docker-compose-infra.yml up -d --no-deps team5_config_server
             
-            # 3. 미사용 이미지 정리
             docker image prune -f
             
             echo "✅ Config Server 배포가 완료되었습니다!"
