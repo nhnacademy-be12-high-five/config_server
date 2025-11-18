@@ -10,18 +10,36 @@ spring:
       server:
         git:
           uri: https://github.com/nhnacademy-be12-high-five/yml-warehouse.git
+          # docker-compose의 환경변수에서 주입받음 (.env 파일 내용)
           username: ${GITHUB_USERNAME}
           password: ${GITHUB_TOKEN}
           clone-on-start: true
-
           search-paths:
             - '{application}'
             - '/'
 
+# Config Server 자신도 Eureka에 등록 (선택 사항이지만 관리를 위해 권장)
+eureka:
+  client:
+    service-url:
+      # 로컬 실행 시: localhost:10481 사용
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:10481/eureka/}
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+---
+# --- Docker 프로필 (prod, blue, green) ---
+spring:
+  config:
+    activate:
+      on-profile: prod,blue,green
+
+# Docker 내부 설정
+server:
+  port: 8888
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+      defaultZone: http://team5-eureka-server:10481/eureka/
