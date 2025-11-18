@@ -1,12 +1,4 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
+name: Deploy Config Server (Infra)
 
 on:
   push:
@@ -15,21 +7,61 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      # 1. 코드 체크아웃
+      - uses: actions/checkout@v4
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+      # 2. JDK 21 설정
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Maven 빌드
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      # 4. Docker Hub 로그인
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 5. Docker 이미지 빌드 및 푸시
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          # 👇 [중요] Config Server 이미지 이름
+          tags: ${{ secrets.DOCKER_USERNAME }}/config-server:latest
+
+      # 6. 서버 접속 및 배포 (인프라용 단순 재시작)
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_ID }}
+          password: ${{ secrets.SSH_PW }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "🚀 Config Server(Infra) 배포를 시작합니다..."
+            cd ~/www/nhnbook
+            
+            # 1. 최신 이미지 다운로드 (서비스 이름: team5_config_server)
+            docker-compose -f docker-compose-infra.yml pull team5_config_server
+            
+            # 2. Config Server만 쏙 골라서 재시작
+            docker-compose -f docker-compose-infra.yml up -d --no-deps team5_config_server
+            
+            # 3. 미사용 이미지 정리
+            docker image prune -f
+            
+            echo "✅ Config Server 배포가 완료되었습니다!"
