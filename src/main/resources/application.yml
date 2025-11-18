@@ -1,7 +1,4 @@
-# --- 기본 프로필 (local/dev) ---
-# 로컬(IntelliJ)에서 'dev' 프로필로 실행 시 사용할 설정
 server:
-  # 포트 테이블 "공용 인프라" 기준 10482
   port: 8888
 
 spring:
@@ -13,6 +10,7 @@ spring:
       server:
         git:
           uri: https://github.com/nhnacademy-be12-high-five/yml-warehouse.git
+          # docker-compose의 환경변수에서 주입받음 (.env 파일 내용)
           username: ${GITHUB_USERNAME}
           password: ${GITHUB_TOKEN}
           clone-on-start: true
@@ -20,11 +18,11 @@ spring:
             - '{application}'
             - '/'
 
-# Config Server 자신도 Eureka에 등록
+# Config Server 자신도 Eureka에 등록 (선택 사항이지만 관리를 위해 권장)
 eureka:
   client:
     service-url:
-      # 로컬(dev)에서 실행 시 사용할 Eureka 주소 (포트 테이블 기준 10481)
+      # 로컬 실행 시: localhost:10481 사용
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:10481/eureka/}
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
@@ -34,17 +32,14 @@ eureka:
 spring:
   config:
     activate:
-      on-profile: prod,blue,green # 쉼표로 구분
+      on-profile: prod,blue,green
 
-# Docker 내부에서 실행될 때의 설정
+# Docker 내부 설정
 server:
-  # Docker 내부 포트
-  # yml-warehouse/config_server-prod.yml의 포트와 일치시킵니다. (예: 8888)
-  # docker-compose-infra.yml은 "10482:8888"로 매핑됩니다.
   port: 8888
 
 eureka:
   client:
     service-url:
-      # Docker 내부에서 컨테이너 이름으로 Eureka를 찾음 (Eureka의 내부 포트 8761)
-      defaultZone: http://eureka_server:8761/eureka/
+
+      defaultZone: http://team5-eureka-server:10481/eureka/
