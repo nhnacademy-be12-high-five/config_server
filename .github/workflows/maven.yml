@@ -54,7 +54,8 @@ jobs:
             echo "🚀 Config Server(Infra) 배포 시작..."
             cd ~/www/nhnbook
 
-            CONTAINER_NAME="team5_config_server"
+            SERVICE_NAME="config_server"  # ⬅ Compose 서비스명
+            CONTAINER_NAME="team5-config-server"
 
             echo "🛑 기존 컨테이너 중지..."
             docker stop $CONTAINER_NAME || true
