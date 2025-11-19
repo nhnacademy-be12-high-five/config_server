@@ -2,7 +2,7 @@ name: Deploy Config Server (Infra)
 
 on:
   push:
-    branches: [ "main","dev"]
+    branches: [ "main", "dev" ]
   pull_request:
     branches: [ "main", "dev" ]
 
@@ -54,18 +54,20 @@ jobs:
             echo "🚀 Config Server(Infra) 배포 시작..."
             cd ~/www/nhnbook
 
-            SERVICE_NAME="config_server"  # ⬅ Compose 서비스명
-            CONTAINER_NAME="team5-config-server"
+            SERVICE_NAME="config_server"      # Compose 서비스명
+            CONTAINER_NAME="team5-config-server"  # 기존 컨테이너 이름
 
             echo "🛑 기존 컨테이너 중지..."
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
 
             echo "📥 최신 이미지 다운로드..."
-            docker-compose pull $CONTAINER_NAME
+            docker-compose pull $SERVICE_NAME
 
             echo "🔄 컨테이너 시작..."
-            docker-compose up -d --no-deps $CONTAINER_NAME
+            docker-compose up -d --no-deps $SERVICE_NAME
 
+            echo "🧹 사용하지 않는 이미지 정리..."
             docker image prune -f
+
             echo "✅ Config Server 배포 완료!"
