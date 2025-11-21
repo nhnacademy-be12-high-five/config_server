@@ -10,7 +10,6 @@ spring:
       server:
         git:
           uri: https://github.com/nhnacademy-be12-high-five/yml-warehouse.git
-          default-label: dev # Git 메인 브랜치
 
           username: ${GITHUB_USERNAME}
           password: ${GITHUB_TOKEN}
