@@ -3,34 +3,37 @@ server:
 
 spring:
   application:
-    name: config-server
+    name: team5_config_server
 
   cloud:
     config:
       server:
         git:
           uri: https://github.com/nhnacademy-be12-high-five/yml-warehouse.git
-          default-label: dev
+          default-label: dev # Git 메인 브랜치
 
           username: ${GITHUB_USERNAME}
           password: ${GITHUB_TOKEN}
           clone-on-start: true
           search-paths:
-            - '{application}'
             - '/'
 
+# 기본(로컬) 실행 시 설정
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:10481/eureka/}
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
 
 ---
+# --- Docker 운영 환경 (prod) ---
 spring:
   config:
     activate:
-      on-profile: prod,blue,green
+      # [수정] blue, green 제거하고 prod만 남김
+      on-profile: prod
 
 # Docker 내부 설정
 server:
@@ -39,4 +42,5 @@ server:
 eureka:
   client:
     service-url:
+      # Docker 내부 통신용 주소
       defaultZone: http://team5-eureka-server:10481/eureka/
