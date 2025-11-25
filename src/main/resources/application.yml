@@ -2,25 +2,10 @@ spring:
   application:
     name: team5_config_server
 
-  cloud:
-    config:
-      server:
-        git:
-          uri: https://github.com/nhnacademy-be12-high-five/yml_warehouse.git
-          username: ${GITHUB_USERNAME}
-          password: ${GITHUB_TOKEN}
-          clone-on-start: true
-          search-paths:
-            - '/'   # 모든 서비스 설정 경로
-
 server:
   port: 8888
 
-# Eureka 등록 정보 (로컬 또는 Docker 환경에서 기본)
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:10481/eureka/}
-  instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
     prefer-ip-address: true

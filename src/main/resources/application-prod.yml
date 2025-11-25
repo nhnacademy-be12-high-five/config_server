@@ -1,0 +1,18 @@
+spring:
+  profiles: prod
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/nhnacademy-be12-high-five/yml_warehouse.git
+          username: ${GITHUB_USERNAME}
+          password: ${GITHUB_TOKEN}
+          clone-on-start: true
+          search-paths:
+            - '/'
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://team5-eureka-server:10481/eureka/
