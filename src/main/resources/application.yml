@@ -1,10 +1,6 @@
 spring:
-  profiles:
-    active: dev
   application:
     name: team5_config_server
-
-
 
 server:
   port: 8888
