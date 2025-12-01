@@ -3,4 +3,4 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-# Config Server는 로컬에서는 필요 없으므로 생략 가능
+# Config Server는 로컬에서는 필요 없으므로 생략 가능!
