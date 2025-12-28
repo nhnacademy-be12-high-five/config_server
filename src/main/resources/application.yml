@@ -7,10 +7,6 @@ spring:
 
 
 server:
-  tomcat:
-    keep-alive-timeout: 65000
-    connection-timeout: 20000
-    max-keep-alive-requests: 10000
   port: 8888
 
 eureka:
